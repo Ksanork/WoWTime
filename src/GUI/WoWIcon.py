@@ -11,9 +11,7 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QWidget
-
-
-
+from src.constants import *
 
 
 class WoWIcon(QDialog):
@@ -22,11 +20,16 @@ class WoWIcon(QDialog):
     DIALOG_MARGIN = 50            #margines okna
     ICON_MARGIN = 0               #margines ikony od okna
 
+    __posX = None
+    __posY = None
+    __isPressed = None
+
+
     def __init__(self, parent=None):
         super(WoWIcon, self).__init__(parent)
 
         icon = QLabel()
-        pixmap = QPixmap("images/wow.png")          # <---- Do stałych
+        pixmap = QPixmap(WOW_TAKEN_IMAGE)          # <---- Do stałych
         layout = QHBoxLayout()
         layout.setContentsMargins(0,0,0,0)
 
@@ -52,10 +55,13 @@ class WoWIcon(QDialog):
         print(self.width())
         print(self.height())
 
-        self.setGeometry(width - self.width() - self.ICON_MARGIN, height - self.height() - self.ICON_MARGIN,
+        self.__posX = width - self.width() - self.ICON_MARGIN
+        self.__posY = height - self.height() - self.ICON_MARGIN
+
+        self.setGeometry(self.__posX, self.__posY,
                          self.width(), self.height())
 
-    def mousePressEvent(self, QMouseEvent):
+    def mouseDoubleClickEvent(self, QMouseEvent):
         if not self.parent().isVisible():
             self.fadeOut()
             self.parent().show()
@@ -65,7 +71,7 @@ class WoWIcon(QDialog):
     def fadeOut(self):
         try:
             self.anim = QPropertyAnimation(self, "windowOpacity".encode())
-            self.anim.setDuration(300)
+            self.anim.setDuration(WOWICON_FADE_DURATION)
             self.anim.setStartValue(1.0)
             self.anim.setEndValue(0.0)
             #self.anim.finished.connect(self.finished)
@@ -77,10 +83,24 @@ class WoWIcon(QDialog):
 
     def fadeIn(self):
         self.anim = QPropertyAnimation(self, "windowOpacity".encode())
-        self.anim.setDuration(300)
+        self.anim.setDuration(WOWICON_FADE_DURATION)
         self.anim.setStartValue(0.0)
         self.anim.setEndValue(1.0)
         # self.anim.finished.connect(self.finished)
         # self.anim.setEasingCurve(QEasingCurve.OutExpo)
 
         self.anim.start()
+
+    def mousePressEvent(self, QMouseEvent):
+        self.__posX = QMouseEvent.pos().x()
+        self.__posY = QMouseEvent.pos().y()
+        self.__isPressed = True
+
+    def mouseReleaseEvent(self, QMouseEvent):
+        self.__isPressed = None
+
+    def mouseMoveEvent(self, QMouseEvent):
+        if self.__isPressed:
+            self.setGeometry(self.mapToGlobal(QMouseEvent.pos()).x() - self.__posX,
+                             self.mapToGlobal(QMouseEvent.pos()).y() - self.__posY,
+                             self.width(), self.height())
