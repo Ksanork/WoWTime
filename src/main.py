@@ -13,7 +13,7 @@ if __name__ == '__main__':
 
     app = QApplication(sys.argv)
 
-    mw = MainWindow()   #i chuj
+    mw = MainWindow()
     img = WoWIcon(mw)
     mw.setChild(img)
     img.show()

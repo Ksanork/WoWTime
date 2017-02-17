@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QPushButton
 from PyQt5.QtWidgets import QWidget
+from constants import *
 
 
 class MainWindow(QWidget):
@@ -9,12 +10,15 @@ class MainWindow(QWidget):
 
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.setWindowTitle("Free-WoW")
+        self.setWindowTitle("WoWTime")
+
+        #self.setGeometry(100, 100, 1000, 100)
+        self.setGeometry(0, 0, MAINWINDOW_WIDTH, MAINWINDOW_HEIGHT)
         self.center()
 
         exitbutton = QPushButton("Zamknij", self)
         exitbutton.clicked.connect(self.handleQuitButton)
-        exitbutton.setGeometry(100, 100, 50, 20)
+        exitbutton.setGeometry(100, 100, 100, 30)
 
     def handleQuitButton(self):
         QApplication.quit()
