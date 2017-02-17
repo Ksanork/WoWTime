@@ -4,6 +4,7 @@ from PyQt5 import QtCore
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtCore import QEasingCurve
 from PyQt5.QtCore import QPropertyAnimation
+from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QDesktopWidget
@@ -44,6 +45,7 @@ class WoWIcon(QDialog):
         self.setLayout(layout)
 
         self.setOnRightBottomCorner()
+        self.setCursor(Qt.OpenHandCursor)
 
         #icon.show()
         print("konstrukt")
@@ -95,9 +97,11 @@ class WoWIcon(QDialog):
         self.__posX = QMouseEvent.pos().x()
         self.__posY = QMouseEvent.pos().y()
         self.__isPressed = True
+        self.setCursor(Qt.ClosedHandCursor)
 
     def mouseReleaseEvent(self, QMouseEvent):
         self.__isPressed = None
+        self.setCursor(Qt.OpenHandCursor)
 
     def mouseMoveEvent(self, QMouseEvent):
         if self.__isPressed:
