@@ -1,9 +1,10 @@
 import sys
-from GUI.MainWindow import MainWindow
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import QByteArray
 from PyQt5.QtCore import QEasingCurve
 from PyQt5.QtCore import QPropertyAnimation
+from PyQt5.QtCore import QTimer
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication
@@ -12,18 +13,21 @@ from PyQt5.QtWidgets import QDialog
 from PyQt5.QtWidgets import QHBoxLayout
 from PyQt5.QtWidgets import QLabel
 from PyQt5.QtWidgets import QWidget
+
+from src.GUI.StatusDialog import StatusDialog
 from src.constants import *
 
-
 class WoWIcon(QDialog):
-   # __mw = None     #referecnja do głównego okna (MainWindow)
 
     DIALOG_MARGIN = 50            #margines okna
     ICON_MARGIN = 0               #margines ikony od okna
 
     __posX = None
     __posY = None
-    __isPressed = None
+    __statusDialog = None
+
+    __hideStatusTimer = None      #timer - po upływie czasu ukryj StatusDialog
+    __showStatusTimer = None      #timer - po upływie czasu pokaż StatusDialog
 
 
     def __init__(self, parent=None):
@@ -47,8 +51,15 @@ class WoWIcon(QDialog):
         self.setOnRightBottomCorner()
         self.setCursor(Qt.OpenHandCursor)
 
-        #icon.show()
-        print("konstrukt")
+        self.__statusDialog = StatusDialog(self)
+        self.__statusDialog.updatePosition(self.__posX, self.__posY)
+
+
+        self.__hideStatusTimer = QTimer(self)
+        self.__hideStatusTimer.timeout.connect(self.hideStatusDialog)
+
+        self.__showStatusTimer = QTimer(self)
+        self.__showStatusTimer.timeout.connect(self.showStatusDialog)
 
     def setOnRightBottomCorner(self):
         width = QDesktopWidget().screenGeometry().width()
@@ -67,6 +78,9 @@ class WoWIcon(QDialog):
         if not self.parent().isVisible():
             self.fadeOut()
             self.parent().show()
+
+        if self.__statusDialog.isVisible():
+            self.__statusDialog.hide()
             #self.hide()
 
 
@@ -100,11 +114,54 @@ class WoWIcon(QDialog):
         self.setCursor(Qt.ClosedHandCursor)
 
     def mouseReleaseEvent(self, QMouseEvent):
-        self.__isPressed = None
+        # self.__isPressed = None
         self.setCursor(Qt.OpenHandCursor)
 
+        self.__statusDialog.updatePosition(self.mapToGlobal(QMouseEvent.pos()).x() - self.__posX,
+                                           self.mapToGlobal(QMouseEvent.pos()).y() - self.__posY)
+
+        #if not self.__statusDialog.isVisible():
+        #self.__showStatusTimer.start(SHOW_STATUSDIALOG_TIME)
+
+
     def mouseMoveEvent(self, QMouseEvent):
-        if self.__isPressed:
-            self.setGeometry(self.mapToGlobal(QMouseEvent.pos()).x() - self.__posX,
-                             self.mapToGlobal(QMouseEvent.pos()).y() - self.__posY,
-                             self.width(), self.height())
+        self.__showStatusTimer.stop()
+        self.hideStatusDialog()
+
+        self.setGeometry(self.mapToGlobal(QMouseEvent.pos()).x() - self.__posX,
+                         self.mapToGlobal(QMouseEvent.pos()).y() - self.__posY,
+                         self.width(), self.height())
+
+
+
+
+    def enterEvent(self, event):
+        if not self.__showStatusTimer.isActive() and not self.__statusDialog.isVisible():
+            self.__showStatusTimer.start(SHOW_STATUSDIALOG_TIME)
+        self.__hideStatusTimer.stop()
+
+    def leaveEvent(self, event):
+        if not self.__hideStatusTimer.isActive():
+            self.startHideTimer()
+        self.__showStatusTimer.stop()
+
+    def showStatusDialog(self):
+        if not self.__statusDialog.isVisible():
+            self.__statusDialog.show()
+
+        self.__showStatusTimer.stop()
+        self.__hideStatusTimer.stop()
+
+    def hideStatusDialog(self):
+        # print("hide")
+        if self.__statusDialog.isVisible():
+            self.__statusDialog.hide()
+
+        self.__showStatusTimer.stop()
+        self.__hideStatusTimer.stop()
+
+    def stopHideTimer(self):
+        self.__hideStatusTimer.stop()
+
+    def startHideTimer(self):
+        self.__hideStatusTimer.start(HIDE_STATUSDIALOG_TIME)

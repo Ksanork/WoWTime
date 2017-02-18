@@ -21,22 +21,12 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
 
-
-    # contextMenu = QMenu("Menu")
-    # action = QAction("Nowy")
-    #
-    #
-    # contextMenu.addAction(action)
-    #
-    # systemtray_icon.setContextMenu(contextMenu)
-
-
     mw = MainWindow()
     img = WoWIcon(mw)
     mw.setChild(img)
     img.show()
 
-    tray = WoWTray(QIcon(WOW_TAKEN_IMAGE), img)
+    #tray = WoWTray(QIcon(WOW_TAKEN_IMAGE), img)
 
 
     sys.exit(app.exec_())
