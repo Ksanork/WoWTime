@@ -37,7 +37,7 @@ class TooltipDialog(QDialog, PrettyWidget):
         super().show()
         try:
             if self.__caller:
-                self.setPosition(self.__caller.pos().x(),
+                self.setPosition(self.__caller.pos().x() - self.width()/2.6,        # ?????
                                  self.__caller.pos().y() - self.height() - self.__tooltipMargin)
         except:
             print(sys.exc_info())

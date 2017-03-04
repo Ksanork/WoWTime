@@ -3,6 +3,7 @@ import sys
 from PyQt5.QtWidgets import QDesktopWidget
 
 from src.GUI.PrettyWidgets.DragDialog import DragDialog
+from src.GUI.StatusDialog import StatusDialog
 from src.GUI.TooltipDialog.TooltipDialog import TooltipDialog
 from src.GUI.TooltipDialog.TooltipDialogCaller import TooltipDialogCaller
 
@@ -16,7 +17,7 @@ class WoWIcon(DragDialog, TooltipDialogCaller):
             print("nowy, lepszy WoWIcon")
             self.setOnRightBottomCorner()
 
-            tooltipDialog = TooltipDialog(self, 100, 100)
+            tooltipDialog = StatusDialog(self, 100, 100)
             # tooltipDialog.setCaller(self)
             self.setTooltipDialog(tooltipDialog)
             # self.setEnableTooltip(None)
